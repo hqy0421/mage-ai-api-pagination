@@ -2,8 +2,11 @@
   "columns": null,
   "headers": null,
   "method": "GET",
+  "pagination": null,
   "payload": null,
   "query": null,
   "response_parser": null,
+  "retry": null,
+  "timeout": null,
   "url": ""
 }

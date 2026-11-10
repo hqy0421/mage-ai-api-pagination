@@ -27,6 +27,72 @@ You must enter the following credentials when configuring this source:
 | `columns` | If the final data returned from the API or from the `response_parser` is not a JSON object (e.g. it’s an array of strings or an array of array of strings), then you must define the columns. | Required (conditionally) |
 |`separator`| If the file extension is TSV, XLSX (or CSV with specific separator), then you can define it | Optional: ',' is default|
 |`has_header`| If the file extension is TSV, XLSX or CSV, and contains a header, then you can define it as True | Optional: False is default|
+|`timeout`| Request timeout in seconds. | Optional: `12` is default|
+|`pagination`| Fetch all pages of a JSON API and merge the records of every page. See [Pagination (OSS)](#pagination-oss). | Optional: no pagination by default|
+|`retry`| Retry requests that fail with `429` or `5xx` status codes, using `Retry-After` or exponential backoff. See [Retries (OSS)](#retries-oss). | Optional: retries enabled with defaults|
+
+### Pagination (OSS)
+
+Add a `pagination` block to fetch every page of a JSON API response. The records of
+all pages are merged into a single result. Pagination only applies to JSON responses;
+CSV, TSV, XLSX, and Google Sheets responses are always fetched with a single request.
+
+| Key | Description | Default |
+| --- | --- | --- |
+| `type` | One of `page`, `offset`, `cursor`, `next_url`. Auto-detected from the other keys when omitted. | `page` |
+| `max_pages` | Maximum number of pages to fetch. | `100` |
+| `stop_when_empty` | Stop when a page returns no records. | `true` |
+| `page_param` | (`page`) Query parameter that holds the page number. | `page` |
+| `first_page` | (`page`) Number of the first page to fetch. | `1` |
+| `page_size_param` / `page_size` | (`page`) Optional page-size parameter name and value, sent on every request. | _None_ |
+| `total_pages_path` | (`page`) Dot-notation path to the total page count in the response body (e.g. `meta.total_pages`). | _None_ |
+| `offset_param` / `offset_start` | (`offset`) Query parameter that holds the offset, and its initial value. | `offset` / `0` |
+| `limit_param` / `limit` | (`offset`) Query parameter that holds the page size, and its value. The offset increases by `limit` after every page. | `limit` / `100` |
+| `total_count_path` | (`offset`) Dot-notation path to the total record count in the response body (e.g. `meta.total`). | _None_ |
+| `cursor_param` | (`cursor`) Query parameter that holds the cursor. | `cursor` |
+| `cursor_path` | (`cursor`) Dot-notation path to the next cursor in the response body (e.g. `meta.next_cursor`). | Required for `cursor` |
+| `cursor_start` | (`cursor`) Cursor value to send on the first request. | _None_ |
+| `next_url_path` | (`next_url`) Dot-notation path to the next page URL in the response body (e.g. `links.next`). Relative URLs are resolved against `url`. | Required for `next_url` |
+
+Pagination stops when there are no more pages, when `max_pages` is reached, or when
+the API returns a cursor or URL that was already requested (duplicate protection
+against infinite loops). For `GET` requests the pagination parameters are added to
+the URL query string; for `POST` requests they are merged into a dictionary payload.
+
+```yaml
+url: https://api.example.com/users
+response_parser: data
+pagination:
+  type: cursor
+  cursor_param: cursor
+  cursor_path: meta.next_cursor
+  max_pages: 50
+```
+
+### Retries (OSS)
+
+Requests that fail with a `429` or `5xx` status code are retried automatically. When
+the response contains a `Retry-After` header (seconds or HTTP-date) it is honored;
+otherwise an exponential backoff delay is used. This applies to every request,
+including each page of a paginated sync.
+
+| Key | Description | Default |
+| --- | --- | --- |
+| `max_attempts` | Total attempts per request, including the first one. Set to `1` to disable retries. | `5` |
+| `base_delay` | Delay in seconds before the first retry. | `1.0` |
+| `backoff_factor` | Multiplier applied to the delay after every attempt. | `2.0` |
+| `max_delay` | Maximum computed backoff delay in seconds. | `60.0` |
+| `respect_retry_after` | Whether to honor the `Retry-After` response header. | `true` |
+| `retry_statuses` | HTTP status codes that trigger a retry. | `[429, 500, 502, 503, 504]` |
+
+```yaml
+url: https://api.example.com/users
+retry:
+  max_attempts: 5
+  base_delay: 1
+  backoff_factor: 2
+  max_delay: 60
+```
 
 ---
 
