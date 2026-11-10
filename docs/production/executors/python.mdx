@@ -1,0 +1,21 @@
+---
+title: "Local python executor"
+sidebarTitle: "Python"
+icon: "python"
+description: "Local python executors are ran within the same container as the scheduler service."
+---
+
+You can customize the compute resource with the same way mentioned in this
+[document](/production/configuring-production-settings/compute-resource).
+section.
+
+### Force local Python executor
+
+If you want to use `local_python` executor when `DEFAULT_EXECUTOR_TYPE` is set to another executor type,
+you can set the `executor_type` to `local_python_force`.
+
+In Mage Pro, sensor blocks with no executor type, or with `executor_type: local_python`, use
+`local_python_force` automatically. This keeps polling in the scheduler service instead of
+creating a remote executor for each sensor block run. To run a sensor remotely, set its
+executor type explicitly, such as `executor_type: k8s`. In a PySpark pipeline, a sensor whose
+code uses Spark continues to use the PySpark executor.

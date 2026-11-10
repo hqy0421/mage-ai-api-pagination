@@ -1,0 +1,28 @@
+---
+title: "Pipeline filtering and tagging"
+description: "How to organize, filter, group, and tag pipelines in Mage."
+"og:image": "https://github.com/mage-ai/mage-ai/assets/59450879/750168bc-9a42-4083-badd-adc120b5f97b"
+---
+
+![Mario pipe](https://github.com/mage-ai/mage-ai/assets/59450879/750168bc-9a42-4083-badd-adc120b5f97b)
+
+A [pipeline](/design/core-abstractions#pipeline) contains references to all the blocks of code you want to run, charts for visualizing data, and organizes the dependency between each block of code.
+
+In the Mage GUI, pipelines can be filtered and grouped to make it easier to find the pipeline you want to run. You can also tag pipelines to make it easier to find pipelines that are related to each other.
+
+![Filtering pipelines](https://user-images.githubusercontent.com/1066980/255380712-3d86d4ac-255b-4894-8a5f-45c10b7c68c8.gif)
+
+In Mage Pro, you can apply or remove tags from the pipeline list by right clicking the desired pipeline and selecting "Update tags." In the modal, type a tag name and press Enter, select an existing matching tag suggestion, or leave a valid typed tag in the field and click "Save." You can add multiple tags this way and remove selected tags as needed.
+
+In Mage Pro, you can also manage tags from a pipeline's settings page. In the **Tags** field, type a tag name and press Enter. You can add multiple tags this way or select existing matching tag suggestions, then click **Save pipeline settings**. Tag names are trimmed, must be non-empty, and can contain up to 70 characters.
+
+Mage will populate a list of existing tags for consistency. Once tags have been applied, you can group/filter your pipelines by tag on the "Pipeline" page.
+
+Status, tag, and type filters appear in a band below the toolbar on the Pipelines page. Select an
+individual chip to remove one value, or select **Clear** to remove all applied filters while
+preserving unrelated list state such as search, grouping, sorting, and page size.
+
+Status, tag, and type filters are preserved when you navigate away and return during the same browser
+session. Free-text search is cleared when you leave the Pipelines page. Saved filters and search text
+are not restored in a new browser session unless they are part of the URL you open. Selecting
+**Clear** also removes the saved filters for the current session.
